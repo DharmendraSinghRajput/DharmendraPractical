@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserDao {
 
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun registerUser(user: ProfileEntity): Long
 
