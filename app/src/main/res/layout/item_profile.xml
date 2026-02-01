@@ -26,6 +26,7 @@
         android:layout_height="50dp"
         android:src="@drawable/icon_person"
         android:scaleType="centerCrop"
+        android:background="@drawable/circle_bg"
         app:shapeAppearanceOverlay="@style/CircleImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

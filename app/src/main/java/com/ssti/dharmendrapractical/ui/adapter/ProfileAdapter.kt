@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide
 import com.ssti.dharmendrapractical.R
 import com.ssti.dharmendrapractical.data.local.ProfileEntity
 import com.ssti.dharmendrapractical.databinding.ItemProfileBinding
+import com.ssti.dharmendrapractical.utils.GeneralFunctions
 
 class ProfileAdapter(
     private val onClick: (position: Int, viewId: Int) -> Unit
@@ -33,26 +34,10 @@ class ProfileAdapter(
         holder.binding.apply {
             tvName.text = item.name
             tvAddress.text = item.address.ifEmpty { item.email }
-            
-            // Load profile image
-            item.imageUri?.let { uriString ->
-                try {
-                    val uri = Uri.parse(uriString)
-                    Glide.with(imgProfile.context)
-                        .load(uri)
-                        .circleCrop()
-                        .placeholder(R.drawable.icon_person)
-                        .error(R.drawable.icon_person)
-                        .into(imgProfile)
-                } catch (e: Exception) {
-                    // If URI parsing fails, show default image
-                    imgProfile.setImageResource(R.drawable.icon_person)
-                }
-            } ?: run {
-                // No image URI, show default image
-                imgProfile.setImageResource(R.drawable.icon_person)
+            item.imageUri?.let { image ->
+                GeneralFunctions.loadImage(root.context, image, imgProfile)
             }
-            
+
             imgEdit.setOnClickListener {
                 onClick(position, R.id.imgEdit)
             }

@@ -57,7 +57,8 @@ class MainActivity : BaseActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
 
-                            // navigateToHome()
+                            startActivity(Intent(this@MainActivity, HomeActivity::class.java))
+                            finish()
                         }
 
                         is Resource.Error -> {

@@ -13,7 +13,7 @@ import com.ssti.dharmendrapractical.databinding.FragmentHomeBinding
 import com.ssti.dharmendrapractical.ui.adapter.CartAdapter
 import com.ssti.dharmendrapractical.utils.Resource
 import com.ssti.dharmendrapractical.viewmodel.HomeViewModel
-import com.ssti.mvvmroomapilrf.utils.showToast
+import com.ssti.dharmendrapractical.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -35,6 +35,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         _binding = FragmentHomeBinding.bind(view)
 
         setupRecyclerView()
+        setupSwipeRefresh()
         observeData()
         viewModel.fetchCartList()
     }
@@ -46,14 +47,24 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.fetchCartList()
+        }
+    }
+
     private fun observeData() {
         lifecycleScope.launch {
             viewModel.cartList.collectLatest { resource ->
                 when (resource) {
                     is Resource.Loading -> {
                         // Show shimmer or progress
+                        if (!binding.swipeRefreshLayout.isRefreshing) {
+                            binding.swipeRefreshLayout.isRefreshing = true
+                        }
                     }
                     is Resource.Success -> {
+                        binding.swipeRefreshLayout.isRefreshing = false
                         resource.data?.let { cartsResponse ->
                             // Flatten all products from all carts into a single list
                             val allProducts = cartsResponse.carts.flatMap { cart ->
@@ -64,9 +75,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         }
                     }
                     is Resource.Error -> {
+                        binding.swipeRefreshLayout.isRefreshing = false
                         requireContext().showToast("Error: ${resource.message}")
                     }
-                    else -> {}
+                    else -> {
+                        binding.swipeRefreshLayout.isRefreshing = false
+                    }
                 }
             }
         }

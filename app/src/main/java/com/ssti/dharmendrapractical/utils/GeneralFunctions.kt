@@ -12,7 +12,7 @@ import com.ssti.dharmendrapractical.R
 object GeneralFunctions {
     fun loadImage(context: Context, url: String, imageView: ImageView, changeScale: Boolean = true) {
         Glide.with(context).load(url).listener(object : RequestListener<Drawable?> {
-            override fun onLoadFailed(e: GlideException?, model: Any?, target: com.bumptech.glide.request.target.Target<Drawable?>?, isFirstResource: Boolean): Boolean {
+            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable?>?, isFirstResource: Boolean): Boolean {
                 imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
                 return false
             }

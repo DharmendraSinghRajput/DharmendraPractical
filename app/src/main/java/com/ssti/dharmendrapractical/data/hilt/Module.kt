@@ -27,10 +27,6 @@ object Module {
     @Singleton
     @Provides
     fun provideService(): RemoteService {
-        var retrofit: Retrofit? = null
-        if (retrofit != null)
-            return retrofit.create(RemoteService::class.java)
-
         val okHttpClientBuilder = OkHttpClient.Builder()
 
         okHttpClientBuilder.connectTimeout(50, TimeUnit.MINUTES)
@@ -48,15 +44,15 @@ object Module {
             chain.proceed(request)
         })
 
-        retrofit = Retrofit.Builder().client(okHttpClientBuilder.build())
+        val retrofit = Retrofit.Builder().client(okHttpClientBuilder.build())
             .baseUrl(APIConst.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        return retrofit!!.create(RemoteService::class.java)
+        return retrofit.create(RemoteService::class.java)
     }
 
-/*    @Provides
+   @Provides
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(
@@ -64,12 +60,11 @@ object Module {
             AppDatabase::class.java,
             "app_database"
         ).build()
-    }*/
-
-    /* @Singleton
+    }
     @Provides
-    fun provideMemesRepository(@ApplicationContext context: Context) = RemoteRepository(provideService(), context)
-*/
+    @Singleton
+    fun provideUserDao(database: AppDatabase): UserDao = database.userDao()
+
     @Singleton
     @Provides
     fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences = context.getSharedPreferences("${context.getString(R.string.app_name)}_PREF", Context.MODE_PRIVATE)
@@ -78,7 +73,4 @@ object Module {
     @Provides
     fun providePrefUtil(sharedPreferences: SharedPreferences) = PrefUtil(sharedPreferences)
 
-/*    @Provides
-    @Singleton
-    fun provideUserDao(database: AppDatabase): UserDao = database.userDao()*/
 }

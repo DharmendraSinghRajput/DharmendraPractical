@@ -9,36 +9,24 @@ import com.ssti.dharmendrapractical.utils.Resource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class HomeRepository @Inject constructor(
-    private val userDao: UserDao,
-    private val remoteService: RemoteService,
-    @ApplicationContext private val context: Context
-) {
-
+class HomeRepository @Inject constructor(private val userDao: UserDao, private val remoteService: RemoteService, @ApplicationContext private val context: Context) {
     fun getCartHomeList(): Flow<Resource<CartsResponse>> = flow {
+        val cachedData = userDao.getCachedCarts()
         emit(Resource.Loading())
-
         try {
             if (NetworkUtil.isNetworkConnected(context)) {
-                // Fetch from API
                 val response = remoteService.getCartResponse()
-
                 if (response.isSuccessful && response.body() != null) {
                     val data = response.body()!!
-                    // Save to Room
                     userDao.insertCarts(listOf(data))
-                    // Emit API data
                     emit(Resource.Success(data))
                 } else {
-                    // API failed → load from Room
-                    val cachedData = userDao.getCachedCarts()
                     if (cachedData != null) {
                         emit(Resource.Success(cachedData))
                     } else {
@@ -46,8 +34,6 @@ class HomeRepository @Inject constructor(
                     }
                 }
             } else {
-                // No Internet → load from Room
-                val cachedData = userDao.getCachedCarts()
                 if (cachedData != null) {
                     emit(Resource.Success(cachedData))
                 } else {
@@ -55,8 +41,6 @@ class HomeRepository @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            // Exception → load from Room
-            val cachedData = userDao.getCachedCarts()
             if (cachedData != null) {
                 emit(Resource.Success(cachedData))
             } else {

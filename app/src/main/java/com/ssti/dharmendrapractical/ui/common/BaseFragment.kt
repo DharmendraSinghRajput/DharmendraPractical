@@ -1,26 +1,64 @@
 package com.ssti.dharmendrapractical.ui.common
 
+import android.net.Uri
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ssti.dharmendrapractical.utils.Resource
+import com.ssti.dharmendrapractical.utils.showToast
 
 open class BaseFragment(layoutId: Int) : Fragment(layoutId) {
-    // Calling Base Activity's handleLoader
-    fun handleLoader(resource: Resource<Any>, showLoader: Boolean = true, swipeRefreshLayout: SwipeRefreshLayout? = null, successResponse: (Resource<Any>) -> Unit) {
-        (this.activity as BaseActivity).handleLoader(resource, showLoader, swipeRefreshLayout = swipeRefreshLayout) { response ->
-            successResponse(response)
+
+    protected val baseActivity: BaseActivity get() = requireActivity() as BaseActivity
+
+    fun showLoader() = baseActivity.showLoader()
+
+    fun hideLoader() = baseActivity.hideLoader()
+
+    fun <T> handleLoader(
+        resource: Resource<T>,
+        showLoader: Boolean = true,
+        swipeRefreshLayout: SwipeRefreshLayout? = null,
+        successResponse: (T) -> Unit = {}
+    ) {
+        when (resource) {
+            is Resource.Loading -> {
+                if (showLoader) showLoader()
+                swipeRefreshLayout?.isRefreshing = true
+            }
+
+            is Resource.Success -> {
+                hideLoader()
+                swipeRefreshLayout?.isRefreshing = false
+            }
+
+            is Resource.Error -> {
+                hideLoader()
+                swipeRefreshLayout?.isRefreshing = false
+                showToast(resource.message ?: "Something went wrong")
+            }
+
+            is Resource.NoInternet -> {
+                hideLoader()
+                swipeRefreshLayout?.isRefreshing = false
+            }
+
+            else -> {}
         }
     }
 
-/*    fun showImagePickerDialog() {
-        (this.activity as BaseActivity).showImagePickerDialog()
-    }*/
+    fun showImagePickerDialog() {
+        baseActivity.showImagePickerDialog()
+    }
 
-   // fun observeImageURI() = (this.activity as BaseActivity).imageUri
+    fun observeSelectedImage(): LiveData<Uri> {
+        return baseActivity.imageUri
+    }
 
-    //fun getPrefUtil() = (this.activity as BaseActivity).prefUtil
+    fun getPrefUtil() = baseActivity.prefUtil
 
-    fun showLoader() = (this.activity as BaseActivity).showLoader()
-
-    fun hideLoader() = (this.activity as BaseActivity).hideLoader()
+    // Optional: convenience method if many fragments need keyboard hiding
+    fun hideKeyboard() {
+        baseActivity.hideKeyboard()
+    }
 }

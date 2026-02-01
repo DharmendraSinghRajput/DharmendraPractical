@@ -15,8 +15,9 @@ import com.ssti.dharmendrapractical.databinding.DialogBoxProfileUpdateBinding
 import com.ssti.dharmendrapractical.databinding.FragmentDetilsBinding
 import com.ssti.dharmendrapractical.ui.adapter.ProfileAdapter
 import com.ssti.dharmendrapractical.ui.common.BaseFragment
+import com.ssti.dharmendrapractical.utils.GeneralFunctions
 import com.ssti.dharmendrapractical.viewmodel.ProfileViewModel
-import com.ssti.mvvmroomapilrf.utils.showAlertDialog
+import com.ssti.dharmendrapractical.utils.showAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -56,6 +57,10 @@ class DetilsFragment : BaseFragment(R.layout.fragment_detils) {
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
+
+        user.imageUri?.let { image ->
+            GeneralFunctions.loadImage(requireContext(), image, dialogBinding.imgProfile)
+        }
 
         // Set current values
         dialogBinding.etName.setText(user.name)

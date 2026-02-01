@@ -21,11 +21,14 @@ class RegisterActivity : BaseActivity() {
     private val viewModel: ProfileViewModel by viewModels()
     private var selectedImageUri: Uri? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        binding.imgProfile.setOnClickListener {
+            showImagePickerDialog()
+        }
         setupImagePicker()
         observeImageUri()
         setupRegisterButton()
@@ -33,9 +36,7 @@ class RegisterActivity : BaseActivity() {
     }
 
     private fun setupImagePicker() {
-        binding.imgProfile.setOnClickListener {
-            showImagePickerDialog()
-        }
+
     }
 
     private fun observeImageUri() {
@@ -76,7 +77,9 @@ class RegisterActivity : BaseActivity() {
                 when (resource) {
                     is Resource.Idle -> {
                     }
-                    is Resource.Loading -> {}
+                    is Resource.Loading -> {
+
+                    }
                     is Resource.Success -> {
                         Toast.makeText(
                             this@RegisterActivity,
